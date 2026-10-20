@@ -1,0 +1,272 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f0f5fc;
+    color: #203653;
+}
+
+.top-header {
+    min-height: 82px;
+    padding: 15px 4%;
+    background: linear-gradient(110deg, #123968, #1976d2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    box-shadow: 0 4px 15px #173c6720;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: white;
+    color: #1458a5;
+    font-weight: 800;
+}
+
+.logo h2 {
+    font-size: 21px;
+}
+
+.logo p {
+    margin-top: 3px;
+    font-size: 12px;
+    color: #d8e8ff;
+}
+
+.back-link {
+    color: white;
+    text-decoration: none;
+    border: 1px solid #ffffff70;
+    border-radius: 8px;
+    padding: 11px 15px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.back-link:hover {
+    background: #ffffff20;
+}
+
+.page-container {
+    max-width: 1400px;
+    margin: 32px auto;
+    padding: 0 24px;
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.eyebrow {
+    color: #1976d2;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.page-title h1 {
+    margin: 8px 0;
+    color: #163e70;
+    font-size: 30px;
+}
+
+.page-title p {
+    color: #718096;
+    font-size: 14px;
+}
+
+.title-icon {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: #dcecff;
+    font-size: 28px;
+}
+
+#projectForm {
+    background: white;
+    border: 1px solid #e1eaf6;
+    border-top: 5px solid #194c80;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px #244a7410;
+    overflow: hidden;
+}
+
+.form-section {
+    padding: 28px;
+}
+
+.form-section h2 {
+    color: #194c80;
+    font-size: 17px;
+    margin-bottom: 27px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e6edf6;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 22px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 0;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.field label {
+    font-size: 14px;
+    font-weight: 650;
+    color: #233f60;
+}
+
+.field input,
+.field select,
+.field textarea {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #cfdbec;
+    border-radius: 8px;
+    background: #fff;
+    color: #243c58;
+    font: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field input,
+.field select {
+    min-height: 51px;
+}
+
+.field textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+    color: #91a2ba;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    border-color: #2781e5;
+    box-shadow: 0 0 0 3px #2781e51c;
+}
+
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 22px 28px;
+    border-top: 1px solid #e2eaf4;
+    background: #fbfdff;
+}
+
+.form-footer button {
+    border: none;
+    border-radius: 8px;
+    padding: 14px 21px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.clear-button {
+    background: #fff;
+    color: #31516f;
+    border: 1px solid #cdd9e8 !important;
+}
+
+.clear-button:hover {
+    background: #eaf1fa;
+}
+
+.submit-button {
+    background: linear-gradient(110deg, #164a85, #1976d2);
+    color: white;
+    box-shadow: 0 4px 10px #1976d226;
+}
+
+.submit-button:hover {
+    background: #103b70;
+    transform: translateY(-1px);
+}
+
+.footer-note {
+    text-align: center;
+    padding: 24px 0 8px;
+    color: #7b8da5;
+    font-size: 12px;
+}
+
+@media (max-width: 650px) {
+    .top-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .page-container {
+        margin: 22px auto;
+        padding: 0 12px;
+    }
+
+    .page-title h1 {
+        font-size: 25px;
+    }
+
+    .form-section {
+        padding: 20px 16px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 19px;
+    }
+
+    .full-width {
+        grid-column: auto;
+    }
+
+    .form-footer {
+        padding: 18px 16px;
+    }
+
+    .form-footer button {
+        flex: 1;
+    }
+}
