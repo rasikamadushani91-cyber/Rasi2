@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDB-PIFS | Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="dashboard.js" defer></script>
+</head>
+<body>
+
+<header class="top-header">
+    
+
+   <nav class="header-actions">
+    <a href="dashboard.html" class="nav-link active">Dashboard</a>
+    <a href="add-project.html" class="nav-link add-link">
+        + Add Project
+    </a>
+</nav>
+</header>
+
+<main class="page-container">
+
+    <section class="welcome-section">
+        <div>
+            <p class="eyebrow">RURAL DEVELOPMENT BUREAU</p>
+            <h2>Project Dashboard</h2>
+            <p>View, search, and filter all registered project information.</p>
+        </div>
+        <button type="button" id="refreshBtn" class="btn btn-light">
+            ↻ Refresh Data
+        </button>
+    </section>
+
+    <section class="summary-grid">
+        <article class="summary-card total-card">
+            <span class="card-icon">▦</span>
+            <p>Total Projects</p>
+            <h3 id="totalProjects">0</h3>
+        </article>
+
+        <article class="summary-card pending-card">
+            <span class="card-icon">◷</span>
+            <p>Pending Projects</p>
+            <h3 id="pendingProjects">0</h3>
+        </article>
+
+        <article class="summary-card accepted-card">
+            <span class="card-icon">✓</span>
+            <p>Accepted Projects</p>
+            <h3 id="acceptedProjects">0</h3>
+        </article>
+
+        <article class="summary-card rejected-card">
+            <span class="card-icon">×</span>
+            <p>Rejected Projects</p>
+            <h3 id="rejectedProjects">0</h3>
+        </article>
+    </section>
+
+    <section class="table-panel">
+        <div class="table-heading">
+            <div>
+                <h2>All Project Records</h2>
+                <p>All saved project fields are displayed in one table.</p>
+            </div>
+
+            <button type="button" id="exportBtn" class="btn btn-primary">
+                ↓ Export CSV
+            </button>
+        </div>
+
+        <div class="filters">
+            <div class="filter-field search-field">
+                <label for="searchInput">Search all projects</label>
+                <input
+                    type="search"
+                    id="searchInput"
+                    placeholder="Search ID, project, district, sector..."
+                >
+            </div>
+
+            <div class="filter-field">
+                <label for="districtFilter">District</label>
+                <select id="districtFilter">
+                    <option value="">All Districts</option>
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label for="statusFilter">Status</label>
+                <select id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Accepted">Accepted</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Returned">Returned</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Ongoing">Ongoing</option>
+                </select>
+            </div>
+
+            <button type="button" id="clearFilters" class="btn btn-light">
+                Clear Filters
+            </button>
+        </div>
+
+        <div class="table-info">
+            <span id="recordCount">Showing 0 projects</span>
+            <span class="scroll-note">Scroll horizontally to view all columns →</span>
+        </div>
+
+        <div class="table-scroll">
+            <table id="projectsTable">
+                <thead>
+                    <tr>
+                        <th>Project ID</th>
+                        <th>Project Name</th>
+                        <th>District</th>
+                        <th>DS Division</th>
+                        <th>GN Division</th>
+                        <th>Sector</th>
+                        <th>Responsible Person</th>
+                        <th>Project Date</th>
+                        <th>Status</th>
+                        <th>Description</th>
+
+                        <th>Received DS Count</th>
+                        <th>Received GN Count</th>
+                        <th>Approved GN Count</th>
+                        <th>Rejected GN Count</th>
+                        <th>All Concept Projects</th>
+                        <th>Estimated Cost (LKR)</th>
+
+                        <th>Approved DS Count</th>
+                        <th>Approved GN Count</th>
+                        <th>Approved Projects Count</th>
+                        <th>Direct Beneficiaries</th>
+                        <th>Project Value (LKR)</th>
+                        <th>Approved Cost (LKR)</th>
+                        <th>Divisions Not Covered</th>
+                        <th>Approved Project Value (LKR)</th>
+                        <th>Approved Allocation (LKR)</th>
+
+                        <th>CDCs Established</th>
+                        <th>Tractor Projects</th>
+                        <th>Tractor Details</th>
+                        <th>Tractor Quantity</th>
+                        <th>Tractor Cost (LKR)</th>
+                    </tr>
+                </thead>
+
+                <tbody id="projectsTableBody">
+                    <tr>
+                        <td colspan="30" class="empty-message">
+                            Loading project records...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="emptyState" class="empty-state" hidden>
+            <div class="empty-icon">▦</div>
+            <h3>No project records found</h3>
+            <p>Add a project or change your search filters.</p>
+            <a href="add-project.html" class="btn btn-primary">
+                Add Your First Project
+            </a>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>RDB-PIFS | Rural Development Bureau</p>
+        <p>Project information management dashboard</p>
+    </footer>
+
+</main>
+</body>
+</html>

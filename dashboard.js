@@ -1,120 +1,296 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const addButton = document.getElementById("addProjectButton");
-    const tableBody = document.getElementById("projectTableBody");
-    const searchInput = document.getElementById("projectSearch");
-    const statusFilter = document.getElementById("statusFilter");
 
-    const totalElement = document.getElementById("totalProjects");
-    const completedElement = document.getElementById("completedProjects");
-    const ongoingElement = document.getElementById("ongoingProjects");
-    const pendingElement = document.getElementById("pendingProjects");
-    const yearElement = document.getElementById("year");
+"use strict";
 
-    if (!addButton || !tableBody) {
-        console.error("Check addProjectButton and projectTableBody in index.html.");
+const STORAGE_KEY = "rdbPifsProjects";
+
+const columns = [
+    ["projectId", "Project ID"],
+    ["projectName", "Project Name"],
+    ["district", "District"],
+    ["division", "DS Division"],
+    ["gsDivision", "GN Division"],
+    ["sector", "Sector"],
+    ["responsiblePerson", "Responsible Person"],
+    ["projectDate", "Project Date"],
+    ["projectStatus", "Status"],
+    ["description", "Description"],
+    ["receivedDS", "Received DS Count"],
+    ["receivedGN", "Received GN Count"],
+    ["approvedGN", "Approved GN Count"],
+    ["rejectedGN", "Rejected GN Count"],
+    ["conceptProjects", "All Concept Projects"],
+    ["estimatedCost", "Estimated Cost (LKR)"],
+    ["approvedDS", "Approved DS Count"],
+    ["approvedGS", "Approved GN Count"],
+    ["approvedProjects", "Approved Projects Count"],
+    ["beneficiaries", "Direct Beneficiaries"],
+    ["projectValue", "Project Value (LKR)"],
+    ["approvedCost", "Approved Cost (LKR)"],
+    ["uncoveredDivisions", "Divisions Not Covered"],
+    ["approvedProjectValue", "Approved Project Value (LKR)"],
+    ["approvedAllocation", "Approved Allocation (LKR)"],
+    ["cdcsEstablished", "CDCs Established"],
+    ["tractorProjects", "Tractor Projects"],
+    ["tractorDetails", "Tractor Details"],
+    ["tractorQuantity", "Tractor Quantity"],
+    ["tractorCost", "Tractor Cost (LKR)"]
+];
+
+const tableBody = document.getElementById("projectsTableBody");
+const searchInput = document.getElementById("searchInput");
+const districtFilter = document.getElementById("districtFilter");
+const statusFilter = document.getElementById("statusFilter");
+const recordCount = document.getElementById("recordCount");
+const emptyState = document.getElementById("emptyState");
+
+function getProjects() {
+    try {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        const projects = savedData ? JSON.parse(savedData) : [];
+        return Array.isArray(projects) ? projects : [];
+    } catch (error) {
+        console.error("Could not read saved projects:", error);
+        return [];
+    }
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => {
+        const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+
+        return entities[character];
+    });
+}
+
+function getStatusClass(status) {
+    const normalized = String(status ?? "")
+        .trim()
+        .toLowerCase();
+
+    const allowedStatuses = [
+        "pending",
+        "accepted",
+        "rejected",
+        "returned",
+        "completed",
+        "ongoing"
+    ];
+
+    return allowedStatuses.includes(normalized)
+        ? `status-${normalized}`
+        : "";
+}
+
+function formatValue(key, value) {
+    if (value === null || value === undefined || value === "") {
+        return "—";
+    }
+
+    if (key === "projectStatus") {
+        const status = escapeHTML(value);
+        const statusClass = getStatusClass(value);
+
+        return `<span class="status-badge ${statusClass}">${status}</span>`;
+    }
+
+    return escapeHTML(value);
+}
+
+function updateSummary(projects) {
+    document.getElementById("totalProjects").textContent =
+        projects.length;
+
+    const countStatus = status =>
+        projects.filter(project =>
+            String(project.projectStatus ?? "")
+                .trim()
+                .toLowerCase() === status
+        ).length;
+
+    document.getElementById("pendingProjects").textContent =
+        countStatus("pending");
+
+    document.getElementById("acceptedProjects").textContent =
+        countStatus("accepted");
+
+    document.getElementById("rejectedProjects").textContent =
+        countStatus("rejected");
+}
+
+function updateDistrictOptions(projects) {
+    const selectedDistrict = districtFilter.value;
+
+    const districts = [
+        ...new Set(
+            projects
+                .map(project => String(project.district ?? "").trim())
+                .filter(Boolean)
+        )
+    ].sort((a, b) => a.localeCompare(b));
+
+    districtFilter.innerHTML =
+        '<option value="">All Districts</option>';
+
+    districts.forEach(district => {
+        const option = document.createElement("option");
+        option.value = district;
+        option.textContent = district;
+        districtFilter.appendChild(option);
+    });
+
+    if (districts.includes(selectedDistrict)) {
+        districtFilter.value = selectedDistrict;
+    }
+}
+
+function getFilteredProjects() {
+    const projects = getProjects();
+
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    const selectedDistrict = districtFilter.value;
+    const selectedStatus = statusFilter.value.toLowerCase();
+
+    return projects.filter(project => {
+        const matchesSearch = columns.some(([key]) =>
+            String(project[key] ?? "")
+                .toLowerCase()
+                .includes(searchTerm)
+        );
+
+        const matchesDistrict =
+            !selectedDistrict ||
+            String(project.district ?? "") === selectedDistrict;
+
+        const matchesStatus =
+            !selectedStatus ||
+            String(project.projectStatus ?? "")
+                .trim()
+                .toLowerCase() === selectedStatus;
+
+        return matchesSearch && matchesDistrict && matchesStatus;
+    });
+}
+
+function renderTable() {
+    const projects = getFilteredProjects();
+
+    recordCount.textContent =
+        `Showing ${projects.length} of ${getProjects().length} projects`;
+
+    emptyState.hidden = projects.length !== 0;
+    tableBody.innerHTML = "";
+
+    if (projects.length === 0) {
         return;
     }
 
-    if (yearElement) {
-        yearElement.textContent = new Date().getFullYear();
-    }
+    const fragment = document.createDocumentFragment();
 
-    // Open the separate Add Project page.
-    addButton.addEventListener("click", function () {
-        window.location.href = "add-project.html";
-    });
-
-    // Read projects saved from the Add Project form.
-    let savedProjects = [];
-
-    try {
-        savedProjects = JSON.parse(localStorage.getItem("rdbProjects") || "[]");
-
-        if (!Array.isArray(savedProjects)) {
-            savedProjects = [];
-        }
-    } catch (error) {
-        console.error("Could not read saved projects:", error);
-        savedProjects = [];
-    }
-
-    // Add saved projects to the table.
-    savedProjects.forEach(function (project) {
+    projects.forEach(project => {
         const row = document.createElement("tr");
 
-        const values = [
-            project.id || "",
-            project.name || "",
-            project.district || "",
-            Number(project.budget || 0).toLocaleString("en-LK")
-        ];
-
-        values.forEach(function (value) {
+        columns.forEach(([key]) => {
             const cell = document.createElement("td");
-            cell.textContent = value;
+            cell.innerHTML = formatValue(key, project[key]);
             row.appendChild(cell);
         });
 
-        const statusCell = document.createElement("td");
-        const badge = document.createElement("span");
-        const status = project.status || "Pending";
-
-        badge.className = "status " + status.toLowerCase();
-        badge.textContent = status;
-        statusCell.appendChild(badge);
-        row.appendChild(statusCell);
-
-        tableBody.appendChild(row);
+        fragment.appendChild(row);
     });
 
-    // Update summary cards using all rows, including saved projects.
-    function updateCounts() {
-        const rows = tableBody.querySelectorAll("tr");
-        let completed = 0;
-        let ongoing = 0;
-        let pending = 0;
+    tableBody.appendChild(fragment);
+}
 
-        rows.forEach(function (row) {
-            const status = row.cells[4]?.textContent.trim();
+function refreshDashboard() {
+    const projects = getProjects();
 
-            if (status === "Completed") completed++;
-            if (status === "Ongoing") ongoing++;
-            if (status === "Pending") pending++;
-        });
+    updateSummary(projects);
+    updateDistrictOptions(projects);
+    renderTable();
+}
 
-        if (totalElement) totalElement.textContent = rows.length;
-        if (completedElement) completedElement.textContent = completed;
-        if (ongoingElement) ongoingElement.textContent = ongoing;
-        if (pendingElement) pendingElement.textContent = pending;
+function clearAllFilters() {
+    searchInput.value = "";
+    districtFilter.value = "";
+    statusFilter.value = "";
+    renderTable();
+}
+
+function exportCSV() {
+    const projects = getFilteredProjects();
+
+    if (projects.length === 0) {
+        alert("There are no project records to export.");
+        return;
     }
 
-    // Search by project name and filter by status.
-    function filterProjects() {
-        const searchText = searchInput.value.toLowerCase().trim();
-        const selectedStatus = statusFilter.value;
+    function csvEscape(value) {
+        let text = String(value ?? "");
 
-        tableBody.querySelectorAll("tr").forEach(function (row) {
-            const name = row.cells[1]?.textContent.toLowerCase() || "";
-            const status = row.cells[4]?.textContent.trim() || "";
+        // Prevent spreadsheet formula injection.
+        if (/^[\s]*[=+\-@]/.test(text)) {
+            text = "'" + text;
+        }
 
-            const matchesName = name.includes(searchText);
-            const matchesStatus =
-                selectedStatus === "all" || status === selectedStatus;
-
-            row.style.display =
-                matchesName && matchesStatus ? "" : "none";
-        });
+        return '"' + text.replace(/"/g, '""') + '"';
     }
 
-    if (searchInput) {
-        searchInput.addEventListener("input", filterProjects);
+    const header = columns.map(([, label]) => csvEscape(label));
+
+    const rows = projects.map(project =>
+        columns.map(([key]) => csvEscape(project[key]))
+    );
+
+    const csvContent = "\uFEFF" +
+        [header, ...rows]
+            .map(row => row.join(","))
+            .join("\r\n");
+
+    const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "RDB-PIFS-Project-Report.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+}
+
+searchInput.addEventListener("input", renderTable);
+districtFilter.addEventListener("change", renderTable);
+statusFilter.addEventListener("change", renderTable);
+
+document.getElementById("clearFilters")
+    .addEventListener("click", clearAllFilters);
+
+document.getElementById("refreshBtn")
+    .addEventListener("click", refreshDashboard);
+
+document.getElementById("exportBtn")
+    .addEventListener("click", exportCSV);
+
+// Update the dashboard when returning from another page
+// or when another browser tab changes the saved records.
+window.addEventListener("pageshow", refreshDashboard);
+
+window.addEventListener("storage", event => {
+    if (event.key === STORAGE_KEY) {
+        refreshDashboard();
     }
-
-    if (statusFilter) {
-        statusFilter.addEventListener("change", filterProjects);
-    }
-
-    updateCounts();
-
-    console.log("RDB-PIFS dashboard loaded.");
 });
+
+// Initial load
+refreshDashboard();
